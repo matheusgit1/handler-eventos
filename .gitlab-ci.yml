@@ -26,7 +26,7 @@ develop:
   image: node:latest
   when: manual
   only:
-    - main
+    - develop
   before_script:
     - echo "My First CICD pipeline "
     - echo  "$NAME"

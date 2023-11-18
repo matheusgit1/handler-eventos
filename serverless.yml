@@ -83,6 +83,7 @@ provider:
 
 functions:
   registrarEvento:
+    name: handler-eventos-${self:provider.stage}-registrar-evento
     handler: src/index.publicarEvento
     memorySize: 1024
     events:
@@ -93,6 +94,7 @@ functions:
           private: true
 
   lerTopico:
+    name: handler-eventos-${self:provider.stage}-ler-topico
     handler: src/index.lerTopico
     memorySize: 1024
     events:
@@ -103,6 +105,7 @@ functions:
           private: true
 
   lerTopicos:
+    name: handler-eventos-${self:provider.stage}-ler-topicos
     handler: src/index.lerTopicos
     memorySize: 1024
     events:
@@ -113,6 +116,7 @@ functions:
           private: true
 
   publicarSns:
+    name: handler-eventos-${self:provider.stage}-publicar-sns
     handler: src/index.publicarSns
     memorySize: 1024
     events:

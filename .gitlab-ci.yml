@@ -21,7 +21,7 @@ code-quailty:
 # 🚀 Deploy
 #############################################################
 
-deployQa:
+develop:
   stage: deploy
   image: node:latest
   when: manual

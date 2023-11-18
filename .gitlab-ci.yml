@@ -20,21 +20,15 @@ code-quailty:
 #############################################################
 # 🚀 Deploy
 #############################################################
-
-develop:
+deploy:
   stage: deploy
-  image: node:latest
-  when: manual
-  only:
-    - develop
-  before_script:
+  script:
     - echo "My First CICD pipeline "
     - echo  "$NAME"
-    - npm config set prefix /usr/local
-    - npm install -g serverless
     - npm install
-    # - npm run test:coverage
-    - serverless config credentials --provider aws --key "$AWS_ACCESS_KEY_ID"  --secret "$AWS_SECRET_ACCESS_KEY" -o
-  script:
-    - sls deploy
-  environment: develop
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set default.region $AWS_DEFAULT_REGION
+    - aws cloudformation package --template-file $SAM_TEMPLATE --s3-bucket seu-bucket-s3 --output-template-file packaged.yaml
+    - aws cloudformation deploy --template-file packaged.yaml --stack-name nome-da-sua-stack --capabilities CAPABILITY_IAM
+    - aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --s3-bucket seu-bucket-s3 --s3-key serverless/nome-da-sua-stack/latest.zip

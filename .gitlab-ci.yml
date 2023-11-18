@@ -1,23 +1,39 @@
 stages:
+  - test
   - deploy
 
-variables:
-  AWS_DEFAULT_REGION: "sua-regiao-aws"
-  AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-  AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-  SAM_TEMPLATE: "caminho-para-seu-template-sam.yaml"
-
-before_script:
-  - export STACK_NAME="serverless-app-$(echo $CI_COMMIT_REF_NAME | tr '[:upper:]' '[:lower:]' | tr -d - | tr -d _)"
-  - export LAMBDA_FUNCTION_NAME="lambda-$(echo $CI_COMMIT_REF_NAME | tr '[:upper:]' '[:lower:]' | tr -d - | tr -d _)"
-
-deploy:
-  stage: deploy
+#############################################################
+# 🚀 Code check
+#############################################################
+code-quailty:
+  image: python:3.7
+  stage: test
+  allow_failure: false
+  before_script:
+    - echo "*********Reformatting code***********"
+    - pip install flake8
+    - pip install bandit
   script:
+    - bandit .
+    - flake8 --select B,C,E,F,W,T4,B9 --ignore E501,W503,F401,F541 --max-line-length 79 --max-complexity 18
+
+#############################################################
+# 🚀 Deploy
+#############################################################
+
+develop:
+  stage: deploy
+  image: node:latest
+  when: manual
+  only:
+    - develop
+  before_script:
+    - echo "My First CICD pipeline "
+    - echo  "$NAME"
+    - npm config set prefix /usr/local
+    - npm install -g serverless
     - npm install
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    - aws configure set default.region $AWS_DEFAULT_REGION
-    - aws cloudformation package --template-file $SAM_TEMPLATE --s3-bucket seu-bucket-s3 --output-template-file packaged.yaml
-    - aws cloudformation deploy --template-file packaged.yaml --stack-name $STACK_NAME --capabilities CAPABILITY_IAM
-    - aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --s3-bucket seu-bucket-s3 --s3-key serverless/$STACK_NAME/latest.zip
+    - serverless config credentials --provider aws --key "$AWS_ACCESS_KEY_ID"  --secret "$AWS_SECRET_ACCESS_KEY" -o
+  script:
+    - sls deploy --org=bigenterprise
+  environment: develop

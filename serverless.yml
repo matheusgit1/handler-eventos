@@ -1,0 +1,128 @@
+org: bigenterprise
+app: handler-eventos
+service: "handler-eventos"
+
+frameworkVersion: "3"
+
+plugins:
+  # - serverless-bundle
+  - serverless-offline-ssm
+  - serverless-webpack
+  - serverless-dotenv-plugin
+
+custom:
+  serverless-offline:
+    httpPort: 3001
+    lambdaPort: 4000
+  serverless-offline-ssm:
+    stages:
+      - offline
+    ssm:
+      "offline/bigenterprise/handler-eventos/api-key": "mock-api-key"
+      "offline/bigenterprise/handler-eventos/aws-access-key": "mock-aws-access-key"
+      "offline/bigenterprise/handler-eventos/aws-secret-access": "mock-aws-secret-access"
+      "offline/bigenterprise/handler-eventos/aws-region": "mock-aws-region"
+  package: ${file(package.json)}
+  webpack:
+    webpackConfig: "webpack.config.js"
+    excludeFiles:
+      - "**/*.spec.ts"
+      - "**/*.ispec.ts"
+  # bundle:
+  #   externals:
+  #     - axios
+
+package:
+  individually: false
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: ${opt:region, file(./values.yml):${self:provider.stage}.REGIAO}
+  lambdaHashingVersion: 20201221
+  stage: ${opt:stage,'develop'}
+  timeout: 30
+  tracing:
+    apiGateway: true
+    lambda: true
+  apiGateway:
+    shouldStartNameWithService: true
+    apiKeys:
+      - value: ${ssm:/${self:provider.stage}/qualicacau/handler-eventos/api-key}
+        description: Api key initial
+
+  environment:
+    # AWS
+    ACCESS_KEY_ID: ${ssm:/${self:provider.stage}/qualicacau/handler-eventos/aws-access-key}
+    SECRET_ACCESS: ${ssm:/${self:provider.stage}/qualicacau/handler-eventos/aws-secret-access}
+    REGION: ${ssm:/${self:provider.stage}/qualicacau/handler-eventos/aws-region}
+    ##
+    AMBIENTE: ${self:provider.stage}
+    SNS_REGIAO: ${file(./values.yml):${self:provider.stage}.SNS_REGIAO}
+    EVENTO_CONFIG_DYNAMODB_REGIAO: ${file(./values.yml):${self:provider.stage}.EVENTO_CONFIG_DYNAMODB_REGIAO}
+    EVENTO_CONFIG_DYNAMODB_NOME_TABELA: ${file(./values.yml):${self:provider.stage}.EVENTO_CONFIG_DYNAMODB_NOME_TABELA}
+  vpc:
+    securityGroupIds:
+      - ${file(./values.yml):${self:provider.stage}.SECURITY_GROUP_API}
+    subnetIds:
+      - ${file(./values.yml):${self:provider.stage}.SUBNET2}
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:Scan
+          Resource:
+            - "*"
+        - Effect: Allow
+          Action:
+            - sns:Publish
+            - sns:CreateTopic
+            - sns:DeleteTopic
+            - iam:PassRole
+          Resource:
+            - "*"
+
+functions:
+  registrarEvento:
+    handler: src/index.publicarEvento
+    memorySize: 1024
+    events:
+      - http:
+          path: /publicar
+          method: post
+          cors: true
+          private: true
+
+  lerTopico:
+    handler: src/index.lerTopico
+    memorySize: 1024
+    events:
+      - http:
+          path: /topico/{topico}/{versao}
+          method: get
+          cors: true
+          private: true
+
+  lerTopicos:
+    handler: src/index.lerTopicos
+    memorySize: 1024
+    events:
+      - http:
+          path: /topicos
+          method: get
+          cors: true
+          private: true
+
+  publicarSns:
+    handler: src/index.publicarSns
+    memorySize: 1024
+    events:
+      - http:
+          path: /sns/publicar
+          method: post
+          cors: true
+          private: true

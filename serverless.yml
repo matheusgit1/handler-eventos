@@ -1,14 +1,14 @@
-org: bigenterprise
+org: ${self:provider.stage}bigenterprise
 app: handler-eventos
 service: "handler-eventos"
 
 frameworkVersion: "3"
 
 plugins:
-  # - serverless-bundle
+  - serverless-bundle
   - serverless-offline-ssm
-  - serverless-webpack
   - serverless-dotenv-plugin
+  - serverless-webpack
 
 custom:
   serverless-offline:
@@ -52,11 +52,6 @@ provider:
         description: Api key initial
 
   environment:
-    # AWS
-    ACCESS_KEY_ID: ${ssm:/${self:provider.stage}/qualicacau/handler-eventos/aws-access-key}
-    SECRET_ACCESS: ${ssm:/${self:provider.stage}/qualicacau/handler-eventos/aws-secret-access}
-    REGION: ${ssm:/${self:provider.stage}/qualicacau/handler-eventos/aws-region}
-    ##
     AMBIENTE: ${self:provider.stage}
     SNS_REGIAO: ${file(./values.yml):${self:provider.stage}.SNS_REGIAO}
     EVENTO_CONFIG_DYNAMODB_REGIAO: ${file(./values.yml):${self:provider.stage}.EVENTO_CONFIG_DYNAMODB_REGIAO}

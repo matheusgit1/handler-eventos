@@ -6,7 +6,7 @@
   "scripts": {
     "test": "set NODE_ENV=TEST && jest",
     "offline": "serverless offline start --stage offline",
-    "sls:publish": "serverless --org=bigenterprise",
+    "sls:publish": "serverless",
     "sls:remove": "serverless remove",
     "test:coverage": "set NODE_ENV=TEST && jest --coverage"
   },

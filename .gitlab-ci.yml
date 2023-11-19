@@ -2,6 +2,9 @@ stages:
   - test
   - deploy
 
+variables:
+  SERVERLESS_ACCESS_KEY: $SERVERLESS_ACCESS_KEY
+
 #############################################################
 # 🚀 Code check
 #############################################################
@@ -22,7 +25,7 @@ code-quailty:
 #############################################################
 
 develop:
-  stage: deploy
+  stage: develop
   image: node:latest
   when: manual
   only:
@@ -35,5 +38,5 @@ develop:
     - npm install
     - serverless config credentials --provider aws --key "$AWS_ACCESS_KEY_ID"  --secret "$AWS_SECRET_ACCESS_KEY" -o
   script:
-    - sls deploy --org=bigenterprise
+    - sls deploy
   environment: develop

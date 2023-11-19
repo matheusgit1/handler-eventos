@@ -25,7 +25,7 @@ code-quailty:
 #############################################################
 
 develop:
-  stage: develop
+  stage: deploy
   image: node:latest
   when: manual
   only:

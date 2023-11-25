@@ -1,8 +1,11 @@
 import { LoggingService } from "./logger.dto";
 
+interface LoggerOptions {
+  loggerTimestamp?: boolean;
+}
 export class Logger implements LoggingService {
   constext: string;
-  constructor(context: string) {
+  constructor(context: string, _options?: LoggerOptions) {
     this.constext = context;
   }
 

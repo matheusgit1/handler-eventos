@@ -1,10 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoProxy } from "../../../infrastructure/proxy/dynamo/dynamo.proxy";
-// import { Logger } from "../../infrastructure/logger/logger";
-import * as dotenv from "dotenv";
-if (process.env.NODE_ENV === "TEST") {
-  dotenv.config();
-}
 
 const setup = () => {
   return new DynamoProxy();
@@ -15,7 +10,6 @@ const setup = () => {
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
-  console.info("handler.publicarEvento sendo processado: body - ", event.body);
   try {
     const service = setup();
     const resultado = await service.consultarTopicos();

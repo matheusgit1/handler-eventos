@@ -1,14 +1,11 @@
-org: ${self:provider.stage}bigenterprise
-app: handler-eventos
-service: "handler-eventos"
+org: bigenterprise
+service: handler-eventos
 
 frameworkVersion: "3"
 
 plugins:
-  - serverless-bundle
-  - serverless-offline-ssm
-  - serverless-dotenv-plugin
   - serverless-webpack
+  - serverless-deployment-bucket
 
 custom:
   serverless-offline:
@@ -28,9 +25,9 @@ custom:
     excludeFiles:
       - "**/*.spec.ts"
       - "**/*.ispec.ts"
-  # bundle:
-  #   externals:
-  #     - axios
+  bundle:
+    externals:
+      - axios
 
 package:
   individually: false
@@ -48,7 +45,7 @@ provider:
   apiGateway:
     shouldStartNameWithService: true
     apiKeys:
-      - value: ${ssm:/${self:provider.stage}/qualicacau/handler-eventos/api-key}
+      - value: ${ssm:/${self:provider.stage}/bigenterprise/handler-eventos/api-key}
         description: Api key initial
 
   environment:
@@ -60,6 +57,7 @@ provider:
     securityGroupIds:
       - ${file(./values.yml):${self:provider.stage}.SECURITY_GROUP_API}
     subnetIds:
+      - ${file(./values.yml):${self:provider.stage}.SUBNET1}
       - ${file(./values.yml):${self:provider.stage}.SUBNET2}
 
   iam:
@@ -80,6 +78,9 @@ provider:
             - iam:PassRole
           Resource:
             - "*"
+
+  deploymentBucket:
+    name: handler-eventos-${self:provider.stage}
 
 functions:
   registrarEvento:

@@ -27,16 +27,16 @@ code-quailty:
 develop:
   stage: develop
   image: node:latest
-  when: manual
+  #when: manual #habilita deploy manual
   only:
     - develop
   before_script:
-    - echo "My First CICD pipeline "
+    - echo "Executando pré-scripts"
     - echo  "$NAME"
     - npm config set prefix /usr/local
     - npm install -g serverless
     - npm install
     - serverless config credentials --provider aws --key "$AWS_ACCESS_KEY_ID"  --secret "$AWS_SECRET_ACCESS_KEY" -o
   script:
-    - sls deploy
+    - sls deploy --org=bigenteprise
   environment: develop

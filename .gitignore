@@ -13,3 +13,7 @@ jspm_packages
 
 #testes
 coverage
+
+#ci
+/.gitlab-ci.yml
+.gitlab-ci.yml

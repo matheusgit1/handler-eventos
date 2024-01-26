@@ -27,7 +27,7 @@ Node, Typescript, Javascript, AWS, IAC, Serverless, jest
 
 antes de publicarmos o tópico sns, o json é validado com um schema armazenado no dynamoDb como descrito na Arquitetura
 
-![Arquitetura](https://gitlab.com/bigenterprise/serverless/handler-eventos/-/blob/develop/imagens/Captura%20de%20tela%202024-01-25%20215933.png?ref_type=heads)
+![Arquitetura](https://github.com/matheusgit1/handler-eventos/blob/develop/imagens/Captura%20de%20tela%202024-01-25%20215933.png)
 
 ## Variáveis de Ambiente
 
